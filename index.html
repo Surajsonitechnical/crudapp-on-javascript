@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6">
+                <h2 class="text-center">Form</h2>
+                <form name="frm" id="frm" onsubmit="formdata(event)">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Name</label>
+                        <input type="text" class="form-control" name="nm" id="nm" aria-describedby="emailHelp"
+                            placeholder="Enter name">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Email address</label>
+                        <input type="email" class="form-control" name="em" id="em" aria-describedby="emailHelp"
+                            placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Password</label>
+                        <input type="password" class="form-control" name="pwd" id="pwd" placeholder="Password">
+                    </div>
+                    <button type="submit" class="btn btn-dark" id="submit">Submit</button>
+                </form>
+                <button type="update" class="btn btn-dark mt-2" id="update" style="display: none;" onclick="updatefun()">Update</button>
+            </div>
+            <div class="col-sm-6">
+                <h2 class="text-center mb-4">Form Data</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Password</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tdata">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <script>
+        function formdata(event) {
+            event.preventDefault()
+            let data = localStorage.getItem("test")
+            if (data != null) {
+                arr = JSON.parse(data)
+            }
+            else {
+                arr = []
+            }
+            let unm = frm.nm.value
+            let uem = frm.em.value
+            let pwd = frm.pwd.value
+            arr.push({ "name": unm, "email": uem, "password": pwd })
+            // console.log(arr)
+            localStorage.setItem("test", JSON.stringify(arr))
+            document.getElementById("frm").reset()
+            getdata()
+        }
+        function getdata() {
+            let udata = localStorage.getItem("test")
+            let frmdata = JSON.parse(udata)
+            let str = ""
+            frmdata.forEach((item, index) => {
+                str += `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.email}</td>
+                    <td>${item.password}</td>
+                    <td><button class="btn btn-danger" onclick="deletefun(${index})">Delete</button></td>
+                    <td><button class="btn btn-info" onclick="editfun(${index})">Edit</button></td>
+                <tr/>
+                `
+              document.getElementById("tdata").innerHTML = str
+            });
+        }
+        getdata()
+
+        function deletefun(ind){
+            let udata = localStorage.getItem("test")
+            let frmdata = JSON.parse(udata)
+           let newdata = frmdata.filter((item,index)=>{
+                return ind != index
+            })
+            // console.log(newdata)
+            localStorage.setItem("test",JSON.stringify(newdata))
+            getdata()
+        }
+        let did = []
+        function editfun(ind){
+            document.getElementById("submit").style.display = "none"
+            document.getElementById("update").style.display = "block"
+            did = ind
+            let udata = localStorage.getItem("test")
+            let frmdata = JSON.parse(udata)
+           let newdata = frmdata.filter((item,index)=>{
+                return ind == index
+            })
+            frm.nm.value = newdata[0].name
+            frm.em.value = newdata[0].email
+            frm.pwd.value = newdata[0].password
+      
+        }
+        function updatefun(){
+            document.getElementById("submit").style.display = "block"
+            document.getElementById("update").style.display = "none"
+            let udata = localStorage.getItem("test")
+            let frmdata = JSON.parse(udata)
+            frmdata[did].name = document.getElementById("nm").value
+            frmdata[did].email = document.getElementById("em").value
+            frmdata[did].password = document.getElementById("pwd").value
+            localStorage.setItem("test",JSON.stringify(frmdata))
+            getdata()
+        }
+    </script>
+</body>
+
+</html>
